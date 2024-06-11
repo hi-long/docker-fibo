@@ -1,0 +1,70 @@
+name: "complex-fibo"
+
+services:
+  client:
+    env_file:
+      - path: ./docker.env
+    build:
+      context: ./client
+      dockerfile: Dockerfile.dev
+    ports:
+      - 5173:5173
+    develop:
+      watch:
+        - path: ./client
+          action: sync
+          target: /app
+          ignore:
+            - node_modules/
+        - path: ./client/package.json
+          action: rebuild
+  api:
+    env_file:
+      - path: ./docker.env
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    develop:
+      watch:
+        - path: ./server
+          action: sync
+          target: /app
+          ignore:
+            - node_modules/
+        - path: ./server/Dockerfile.dev
+          action: rebuild
+        - path: ./server/package.json
+          action: rebuild
+    ports:
+      - 3000:3000
+  worker:
+    build:
+      context: ./worker
+      dockerfile: Dockerfile.dev
+    develop:
+      watch:
+        - path: ./worker
+          action: sync
+          target: /app
+          ignore:
+            - node_modules/
+  redis:
+    env_file:
+      - path: ./docker.env
+    image: redis:alpine
+  pg:
+    env_file:
+      - path: ./docker.env
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    develop:
+      watch:
+        - path: ./nginx/default.conf
+          action: rebuild
+    ports:
+      - 8080:8080

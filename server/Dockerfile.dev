@@ -1,0 +1,11 @@
+FROM oven/bun:alpine
+
+RUN adduser -D -u 1001 app
+USER app
+
+WORKDIR /app
+COPY ./package.json ./
+RUN bun install
+
+COPY --chown=app:app . /app
+CMD [ "bun", "run", "dev" ]

@@ -1,0 +1,33 @@
+name: "complex-fibo"
+
+services:
+  client:
+    env_file:
+      - path: ./docker.env
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - 5173:5173
+  api:
+    env_file:
+      - path: ./docker.env
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+  redis:
+    env_file:
+      - path: ./docker.env
+    image: redis:alpine
+  pg:
+    env_file:
+      - path: ./docker.env
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 8080:8080
